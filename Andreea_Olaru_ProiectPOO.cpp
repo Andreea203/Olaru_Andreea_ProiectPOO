@@ -79,6 +79,33 @@ public:
 		return *this;
 	}
 
+	Magazine operator+=(const Magazine& m) {
+		int aux = this->nrArticole;
+		this->nrArticole += m.nrArticole;
+		string* vector = new string[this->nrArticole];
+		for (int i = 0; i < aux; i++) {
+			vector[i] = this->numeArticole[i];
+		}
+		for (int i = aux; i < this->nrArticole; i++) {
+			vector[i] = m.numeArticole[i - aux];
+		}
+		if (this->numeArticole != NULL) {
+			delete[]this->numeArticole;
+		}
+		this->numeArticole = vector;
+		return *this;
+	}
+
+	bool operator!=(const Magazine& m) {
+		return this->suprafata != m.suprafata && this->nrArticole != m.nrArticole;
+	}
+
+	string& operator[](int i) {
+		if (i >= 0 && i < nrArticole) {
+			return numeArticole[i];
+		}
+	}
+
 	~Magazine() {
 		if (this->numeArticole != NULL) {
 			delete[]this->numeArticole;
@@ -163,7 +190,6 @@ public:
 			return numeArticole[i];
 		}
 	}
-
 	friend string getArticole(const Magazine& m);
 };
 int Magazine::nrInventar = 100;
@@ -253,13 +279,55 @@ public:
 		return *this;
 	}
 
+	friend ostream& operator<<(ostream& op, const Angajati& a) {
+		op<<"Angajatii au ca si uniforma: " << a.uniforma << ", au un salariu de " << a.salariu << " lei, sunt in numar de " << a.nrAngajati << " si se numesc: ";
+		if (a.nrAngajati > 0) {
+			for (int i = 0; i < a.nrAngajati; i++) {
+				op << a.numeAngajati[i] << " ";
+			}
+		}
+		else {
+			op << "NA";
+		}
+		op << endl;
+		return op;
+	}
+
+	Angajati operator+(Angajati an) {
+		Angajati aux = *this;
+		aux.uniforma = this->uniforma + an.uniforma;
+		aux.salariu = this->salariu + an.salariu;
+		aux.nrAngajati = this->nrAngajati + an.nrAngajati;
+		if (aux.numeAngajati != NULL) {
+			delete[]aux.numeAngajati;
+		}
+		aux.numeAngajati = new string[aux.nrAngajati];
+		for (int i = 0; i < this->nrAngajati; i++) {
+			aux.numeAngajati[i] = this->numeAngajati[i];
+		}
+		for (int i = this->nrAngajati; i < aux.nrAngajati; i++) {
+			aux.numeAngajati[i] = an.numeAngajati[i - this->nrAngajati];
+		}
+		return aux;
+	}
+
+	Angajati operator+(int salariu) const {
+		Angajati aux = *this;
+		aux.salariu = this->salariu + salariu;
+		return aux;
+	}
+
+	bool operator>(Angajati a) {
+		return this->salariu > a.salariu && this->nrAngajati > a.nrAngajati;
+	}
+
 	~Angajati() {
 		if (this->numeAngajati != NULL) {
 			delete[]this->numeAngajati;
 		}
 	}
 
-	void afisareAngajati() {
+	/*void afisareAngajati() {
 		cout << "Angajatii au ca si uniforma: " << uniforma << ", au un salariu de " << salariu << " lei, sunt in numar de " << nrAngajati << " si se numesc: ";
 		if (nrAngajati > 0) {
 			for (int i = 0; i < nrAngajati; i++) {
@@ -270,7 +338,7 @@ public:
 			cout << "nu exista angajati.";
 		}
 		cout << endl;
-	}
+	}*/
 
 	void adaugareAngajat(string numeAngajat) {
 		string* aux = new string[this->nrAngajati + 1];
@@ -424,6 +492,43 @@ public:
 		return *this;
 	}
 
+	Produse operator-(Produse p) {
+		Produse aux = *this;
+		aux.pret = this->pret - p.pret;
+		aux.greutate = this->greutate - p.greutate;
+		aux.cantitate = this->cantitate - p.cantitate;
+		if (aux.numeProduse != NULL) {
+			delete[]aux.numeProduse;
+		}
+		aux.numeProduse = new string[aux.cantitate];
+		for (int i = 0; i < aux.cantitate; i++) {
+			aux.numeProduse[i] = this->numeProduse[i];
+		}
+		return aux;
+	}
+
+	bool operator>=(Produse p) {
+		return this->pret >= p.pret;
+	}
+
+	friend istream& operator>>(istream& is, Produse& p) {
+		cout << "Pretul produsului: ";
+		is >> p.pret;
+		cout << "Greutatea produsului: ";
+		is >> p.greutate;
+		cout << "Cantitate: ";
+		is >> p.cantitate;
+		cout << "Nume produs: ";
+		if (p.numeProduse != NULL) {
+			delete[]p.numeProduse;
+		}
+		p.numeProduse = new string[p.cantitate];
+		for (int i = 0; i < p.cantitate; i++) {
+			is >> p.numeProduse[i];
+		}
+		return is;
+	}
+
 	~Produse() {
 		if (this->numeProduse != NULL) {
 			delete[]this->numeProduse;
@@ -552,16 +657,28 @@ void main() {
 	/*cout << m1.getNumeArticole() << endl;*/
 	cout << m1.getNumeArticol(1) << endl;
 	delete[]vector;
-	/*cout << getArticole(m1);*/
+	cout << getArticole(m1);
 	cout << endl;
+	
+	Magazine magazin4;
+	magazin4 += magazin2;
+	magazin4.afisareMagazine();
+	if (magazin3 != magazin4) {
+		cout << "Cele 2 magazine sunt diferite.";
+	}
+	else cout << "Cele 2 magazine sunt identice.";
+	cout << endl;
+	magazin1.afisareMagazine();
+	magazin1[0] = "palarii";
+	magazin1.afisareMagazine();
 
 	Angajati angajat1;
-	angajat1.afisareAngajati();
+	//angajat1.afisareAngajati();
 
 	Angajati angajat2("camasa", 2800);
-	angajat2.afisareAngajati();
+	/*angajat2.afisareAngajati();
 	angajat2.adaugareAngajat("Ioana");
-	angajat2.afisareAngajati();
+	angajat2.afisareAngajati();*/
 
 	string* numeAngajati = new string[3];
 	numeAngajati[0] = "Alex";
@@ -569,12 +686,12 @@ void main() {
 	numeAngajati[2] = "Maria";
 
 	Angajati angajat3("camasa", 3000, 3, numeAngajati);
-	angajat3.afisareAngajati();
+	//angajat3.afisareAngajati();
 
 	cout << Angajati::getIdAngajat() << endl; 
 	Angajati a1 = angajat2;
 	Angajati a2(angajat2);
-	angajat2.afisareAngajati();
+	/*angajat2.afisareAngajati();*/
 	cout << a1.getNrMaximZileConcediu() << endl;
 	cout << a1.getUniforma() << endl;
 	a1.setUniforma("costum");
@@ -588,12 +705,24 @@ void main() {
 
 	string* vector1= new string[2]{ "Ana", "Raluca" };
 	a1.setAngajati(2, vector1);
-	a1.afisareAngajati();
+	//a1.afisareAngajati();
 	cout << *a1.getNumeAngajati() << endl;
 	/*cout << a1.getNumeAngajati() << endl; */
 	cout << a1.getNumeAngajat(1) << endl;
 	delete[]vector1;
-	/*cout << getSirAngajati(a1);*/
+	cout << getSirAngajati(a1);
+	cout << endl;
+	cout << a1;
+	Angajati a4;
+	a4 = a1 + angajat3;
+	cout << a4;
+	Angajati a5;
+	a5 = a1 + 1500;
+	cout << a5;
+	if (a1 > a5) {
+		cout << "Angajatii din magazinul 1 au un salariu mai mare/sunt mai numerosi.";
+	}
+	else cout << "Angajatii din magazinul 5 au un salariu mai mare/sunt mai numerosi.";
 	cout << endl;
 
 	Produse produs1;
@@ -634,4 +763,14 @@ void main() {
 	//cout << p1.getNumeProduse() << endl;
 	cout << p1.getNumeProdus(1) << endl;
 	delete[]vector2;
+	cin >> produs1;
+	produs1.afisareProdus();
+	if (p1 >= produs3) {
+		cout << "Produsele sunt mai scumpe.";
+		}
+	else cout << "Produsele sunt mai ieftine.";
+	cout << endl;
+	Produse p3;
+	p3 = p1 - produs3;
+	p3.afisareProdus();
 }
