@@ -1,4 +1,5 @@
 #include<iostream>
+#include<vector>
 using namespace std;
 //Andreea Maria Olaru - Mall
 
@@ -104,6 +105,38 @@ public:
 		if (i >= 0 && i < nrArticole) {
 			return numeArticole[i];
 		}
+	}
+
+	friend ostream& operator<<(ostream& op, const Magazine& m) {
+		op << "Magazinul " << m.numeFirma << " , cu suprafata de " << m.suprafata << " m^2, are " << m.nrArticole << " tipuri de articole vestimentare, si anume: ";
+		if (m.nrArticole > 0) {
+			for (int i = 0; i < m.nrArticole; i++) {
+				op << m.numeArticole[i] << ", ";
+			}
+		}
+		else {
+			op << " inca nu are articole.";
+		}
+		op << endl;
+		return op;
+	}
+
+	friend istream& operator>>(istream& is, Magazine& m) {
+		cout << "Numele firmei: ";
+		is >> m.numeFirma;
+		cout << "Suprafata: ";
+		is >> m.suprafata;
+		cout << "Numar articole: ";
+		is >> m.nrArticole;
+		cout << "Tipul articolelor: ";
+		if (m.numeArticole != NULL) {
+			delete[]m.numeArticole;
+		}
+		m.numeArticole = new string[m.nrArticole];
+		for (int i = 0; i < m.nrArticole; i++) {
+			is >> m.numeArticole[i];
+		}
+		return is;
 	}
 
 	~Magazine() {
@@ -293,6 +326,24 @@ public:
 		return op;
 	}
 
+	friend istream& operator>>(istream& is, Angajati& a) {
+		cout << "Uniforma: ";
+		is >> a.uniforma;
+		cout << "Salariu: ";
+		is >> a.salariu;
+		cout << "Numar angajati: ";
+		is >> a.nrAngajati;
+		cout << "Nume angajati: ";
+		if (a.numeAngajati != NULL) {
+			delete[]a.numeAngajati;
+		}
+		a.numeAngajati = new string[a.nrAngajati];
+		for (int i = 0; i < a.nrAngajati; i++) {
+			is >> a.numeAngajati[i];
+		}
+		return is;
+	}
+
 	Angajati operator+(Angajati an) {
 		Angajati aux = *this;
 		aux.uniforma = this->uniforma + an.uniforma;
@@ -327,7 +378,7 @@ public:
 		}
 	}
 
-	/*void afisareAngajati() {
+	void afisareAngajati() {
 		cout << "Angajatii au ca si uniforma: " << uniforma << ", au un salariu de " << salariu << " lei, sunt in numar de " << nrAngajati << " si se numesc: ";
 		if (nrAngajati > 0) {
 			for (int i = 0; i < nrAngajati; i++) {
@@ -338,7 +389,7 @@ public:
 			cout << "nu exista angajati.";
 		}
 		cout << endl;
-	}*/
+	}
 
 	void adaugareAngajat(string numeAngajat) {
 		string* aux = new string[this->nrAngajati + 1];
@@ -511,6 +562,20 @@ public:
 		return this->pret >= p.pret;
 	}
 
+	friend ostream& operator<<(ostream& op, const Produse& p) {
+		op << "Produsele au un pret de " << p.pret << " lei, au o greutate de " << p.greutate << " kg, se afla intr-o cantitate de " << p.cantitate << " si au denumirile de: ";
+		if (p.cantitate > 0) {
+			for (int i = 0; i < p.cantitate; i++) {
+				op << p.numeProduse[i] << ", ";
+			}
+		}
+		else {
+			op << "nu exista produse.";
+		}
+		op << endl;
+		return op;
+	}
+
 	friend istream& operator>>(istream& is, Produse& p) {
 		cout << "Pretul produsului: ";
 		is >> p.pret;
@@ -612,118 +677,185 @@ public:
 			return numeProduse[i];
 		}
 	}
+
+
 };
 int Produse::nrInventar = 300;
 
-void main() {
-	Magazine magazin1;
-	magazin1.afisareMagazine();
-
-	string* numeArticole = new string[3];
-	numeArticole[0] = "tricouri";
-	numeArticole[1] = "pantaloni";
-	numeArticole[2] = "veste";
-
-	Magazine magazin2("Nike", 30);
-	magazin2.afisareMagazine();
-	magazin2.adaugareArticol("geci");
-	magazin2.afisareMagazine();
-
-	Magazine magazin3("Adidas", 35, 3, numeArticole);
-	magazin3.afisareMagazine();
-
-	/*cout << magazin2.getNrInventar() << endl;*/
-	cout << Magazine::getNrInventar() << endl;
-	Magazine m1 = magazin2;
-	Magazine m2(magazin2);
-	magazin2.afisareMagazine();
-	m1 = magazin2;
-	m1.afisareMagazine();
-	cout << m1.getNrTotalMagazine() << endl;
-	cout << m1.getNumeFirma() << endl;
-	m1.setNumeFirma("Puma");
-	cout << m1.getNumeFirma() << endl;
-	cout << m1.getSuprafata() << endl;
-	m1.setSuprafata(40);
-	cout << m1.getSuprafata() << endl;
-	cout << m1.getNrArticole() << endl;
-	m1.setNrArticole(7);
-	cout << m1.getNrArticole() << endl;
-
-	string* vector = new string[2]{ "sepci","palarii" };
-	m1.setArticole(2, vector);
-	m1.afisareMagazine();
-	cout << *m1.getNumeArticole()<< endl;
-	/*cout << m1.getNumeArticole() << endl;*/
-	cout << m1.getNumeArticol(1) << endl;
-	delete[]vector;
-	cout << getArticole(m1);
-	cout << endl;
-	
-	Magazine magazin4;
-	magazin4 += magazin2;
-	magazin4.afisareMagazine();
-	if (magazin3 != magazin4) {
-		cout << "Cele 2 magazine sunt diferite.";
+class Inventar {
+private:
+	Produse cantitate;
+	string denumire;
+	string dataInventariere;
+public:
+	Inventar() {
+		this->denumire = "Tricouri";
+		this->dataInventariere = "22 Noiembrie";
 	}
-	else cout << "Cele 2 magazine sunt identice.";
-	cout << endl;
-	magazin1.afisareMagazine();
-	magazin1[0] = "palarii";
-	magazin1.afisareMagazine();
+	Inventar(string denumire, string dataInventariere, Produse& p) {
+		this->denumire = denumire;
+		this->dataInventariere = dataInventariere;
+		this->cantitate = p;
+	}
+	Inventar(Produse& p) {
+		this->denumire = "Pantaloni";
+		this->dataInventariere = "23 Noiembrie";
+		this->cantitate = p;
+	}
+	void afisareInventar() {
+		cout << "Inventarul pentru produsele de tip: " << denumire << endl << "Data la care a fost facut inventarul: " << dataInventariere << endl;
+		cantitate.afisareProdus();
+	}
+	string getDenumire() {
+		return denumire;
+	}
+	void setDenumire(string denumire) {
+		this->denumire = denumire;
+	}
+	string getDataInventariere() {
+		return dataInventariere;
+	}
+	void setDataInventariere() {
+		this->dataInventariere = dataInventariere;
+	}
+	int getCantitateProdus() {
+		cout << "La data de: " << dataInventariere << ", produsele de tip: " << denumire << " au fost trecute in inventar intr-o cantitate de: " << cantitate.getCantitate();
+	}
+	void setCantitateProdus(Produse& cantitate) {
+		this->cantitate = cantitate;
+	}
+	Inventar operator=(const Inventar& in) {
+		this->denumire = in.denumire;
+		this->dataInventariere = in.dataInventariere;
+		this->cantitate = in.cantitate;
+		return *this;
+	}
+	friend ostream& operator<<(ostream& afis, const Inventar& inv) {
+		afis << "Denumire produs: " << inv.denumire << endl;
+		afis << "Data inventariere: " << inv.dataInventariere << endl;
+		afis << "Cate produse se afla in inventar: " << inv.cantitate << endl;
+		return afis;
+	}
+	friend istream& operator>>(istream& citire, Inventar& i) {
+		cout << "Denumire: ";
+		citire >> i.denumire;
+		cout << "Data inventariere: ";
+		citire >> i.dataInventariere;
+		cout << "Cantitate: ";
+		citire >> i.cantitate;
+		return citire;
+	}
+};
 
-	Angajati angajat1;
+void main() {
+	//Magazine magazin1;
+	//magazin1.afisareMagazine();
+
+	//string* numeArticole = new string[3];
+	//numeArticole[0] = "tricouri";
+	//numeArticole[1] = "pantaloni";
+	//numeArticole[2] = "veste";
+
+	//Magazine magazin2("Nike", 30);
+	//magazin2.afisareMagazine();
+	//magazin2.adaugareArticol("geci");
+	//magazin2.afisareMagazine();
+
+	//Magazine magazin3("Adidas", 35, 3, numeArticole);
+	//magazin3.afisareMagazine();
+
+	///*cout << magazin2.getNrInventar() << endl;*/
+	//cout << Magazine::getNrInventar() << endl;
+	//Magazine m1 = magazin2;
+	//Magazine m2(magazin2);
+	//magazin2.afisareMagazine();
+	//m1 = magazin2;
+	//m1.afisareMagazine();
+	//cout << m1.getNrTotalMagazine() << endl;
+	//cout << m1.getNumeFirma() << endl;
+	//m1.setNumeFirma("Puma");
+	//cout << m1.getNumeFirma() << endl;
+	//cout << m1.getSuprafata() << endl;
+	//m1.setSuprafata(40);
+	//cout << m1.getSuprafata() << endl;
+	//cout << m1.getNrArticole() << endl;
+	//m1.setNrArticole(7);
+	//cout << m1.getNrArticole() << endl;
+
+	//string* vector = new string[2]{ "sepci","palarii" };
+	//m1.setArticole(2, vector);
+	//cout << m1;
+	//cout << *m1.getNumeArticole()<< endl;
+	///*cout << m1.getNumeArticole() << endl;*/
+	//cout << m1.getNumeArticol(1) << endl;
+	//delete[]vector;
+	//cout << getArticole(m1);
+	//cout << endl;
+	//
+	//Magazine magazin4;
+	//magazin4 += magazin2;
+	//magazin4.afisareMagazine();
+	//if (magazin3 != magazin4) {
+	//	cout << "Cele 2 magazine sunt diferite.";
+	//}
+	//else cout << "Cele 2 magazine sunt identice.";
+	//cout << endl;
+	//magazin1.afisareMagazine();
+	//magazin1[0] = "palarii";
+	//magazin1.afisareMagazine();
+
+	//Angajati angajat1;
 	//angajat1.afisareAngajati();
 
-	Angajati angajat2("camasa", 2800);
-	/*angajat2.afisareAngajati();
-	angajat2.adaugareAngajat("Ioana");
-	angajat2.afisareAngajati();*/
+	//Angajati angajat2("camasa", 2800);
+	//angajat2.afisareAngajati();
+	//angajat2.adaugareAngajat("Ioana");
+	//angajat2.afisareAngajati();
 
-	string* numeAngajati = new string[3];
-	numeAngajati[0] = "Alex";
-	numeAngajati[1] = "Andrei";
-	numeAngajati[2] = "Maria";
+	//string* numeAngajati = new string[3];
+	//numeAngajati[0] = "Alex";
+	//numeAngajati[1] = "Andrei";
+	//numeAngajati[2] = "Maria";
 
-	Angajati angajat3("camasa", 3000, 3, numeAngajati);
+	//Angajati angajat3("camasa", 3000, 3, numeAngajati);
 	//angajat3.afisareAngajati();
 
-	cout << Angajati::getIdAngajat() << endl; 
-	Angajati a1 = angajat2;
-	Angajati a2(angajat2);
-	/*angajat2.afisareAngajati();*/
-	cout << a1.getNrMaximZileConcediu() << endl;
-	cout << a1.getUniforma() << endl;
-	a1.setUniforma("costum");
-	cout << a1.getUniforma() << endl;
-	cout << a1.getSalariu() << endl;
-	a1.setSalariu(4000);
-	cout << a1.getSalariu() << endl;
-	cout << a1.getNrAngajati() << endl;
-	a1.setNrAngajati(2);
-	cout << a1.getNrAngajati() << endl;
+	//cout << Angajati::getIdAngajat() << endl; 
+	//Angajati a1 = angajat2;
+	//Angajati a2(angajat2);
+	//angajat2.afisareAngajati();
+	//cout << a1.getNrMaximZileConcediu() << endl;
+	//cout << a1.getUniforma() << endl;
+	//a1.setUniforma("costum");
+	//cout << a1.getUniforma() << endl;
+	//cout << a1.getSalariu() << endl;
+	//a1.setSalariu(4000);
+	//cout << a1.getSalariu() << endl;
+	//cout << a1.getNrAngajati() << endl;
+	//a1.setNrAngajati(2);
+	//cout << a1.getNrAngajati() << endl;
 
-	string* vector1= new string[2]{ "Ana", "Raluca" };
-	a1.setAngajati(2, vector1);
+	//string* vector1= new string[2]{ "Ana", "Raluca" };
+	//a1.setAngajati(2, vector1);
 	//a1.afisareAngajati();
-	cout << *a1.getNumeAngajati() << endl;
-	/*cout << a1.getNumeAngajati() << endl; */
-	cout << a1.getNumeAngajat(1) << endl;
-	delete[]vector1;
-	cout << getSirAngajati(a1);
-	cout << endl;
-	cout << a1;
-	Angajati a4;
-	a4 = a1 + angajat3;
-	cout << a4;
-	Angajati a5;
-	a5 = a1 + 1500;
-	cout << a5;
-	if (a1 > a5) {
-		cout << "Angajatii din magazinul 1 au un salariu mai mare/sunt mai numerosi.";
-	}
-	else cout << "Angajatii din magazinul 5 au un salariu mai mare/sunt mai numerosi.";
-	cout << endl;
+	//cout << *a1.getNumeAngajati() << endl;
+	//cout << a1.getNumeAngajati() << endl; 
+	//cout << a1.getNumeAngajat(1) << endl;
+	//delete[]vector1;
+	//cout << getSirAngajati(a1);
+	//cout << endl;
+	//cout << a1;
+	//Angajati a4;
+	//a4 = a1 + angajat3;
+	//cout << a4;
+	//Angajati a5;
+	//a5 = a1 + 1500;
+	//cout << a5;
+	//if (a1 > a5) {
+	//	cout << "Angajatii din magazinul 1 au un salariu mai mare/sunt mai numerosi.";
+	//}
+	//else cout << "Angajatii din magazinul 5 au un salariu mai mare/sunt mai numerosi.";
+	//cout << endl;
 
 	Produse produs1;
 	produs1.afisareProdus();
@@ -773,4 +905,52 @@ void main() {
 	Produse p3;
 	p3 = p1 - produs3;
 	p3.afisareProdus();
+
+	/*const int numarProduse_P = 2;
+	std::vector<Produse>vectorProduse(numarProduse_P);
+
+
+	for (int i = 0; i < numarProduse_P; ++i) {
+		cout << "Introduceti datele pentru obiectul Produs la pozitia " << i << ":\n";
+		cin >> vectorProduse[i];
+	}
+	cout << endl << endl;
+	for (int i = 0; i < numarProduse_P; ++i) {
+		cout << "Afisare obiect Produs la pozitia " << i << ":\n";
+		cout << vectorProduse[i];
+	}
+
+	const int numar_linii = 2;
+	const int numar_coloane = 2;
+
+	Produse matriceProduse[numar_linii][numar_coloane];
+	for (int i = 0; i < numar_linii; ++i) {
+		for (int j = 0; j < numar_coloane; ++j) {
+			cout<<"Introduceti datele pentru obiectul Produs la pozitia ["<<i<<"]["<<j<<"]:\n";
+			cin >> matriceProduse[i][j];
+			cout << endl;
+		}
+	}
+
+	for (int i = 0; i < numar_linii; ++i) {
+		for (int j = 0; j < numar_coloane; ++j) {
+			cout << "Afisare obiect Produs la pozitia [" << i << "][" << j << "]:\n";
+			cout << matriceProduse[i][j];
+		}
+	}*/
+
+	Inventar inventar1("Adidasi", "31 Octombrie", p1);
+	Inventar inventar2(produs3);
+	Inventar i3;
+	Inventar i4(p2);
+	i3 = inventar1;
+	inventar1.afisareInventar();
+	inventar2.getDenumire();
+	cout << inventar1.getCantitateProdus() << endl;
+	inventar1.afisareInventar();
+	inventar2.afisareInventar();
+	cout << endl;
+	cout << i3;
+	cin >> i4;
+	cout << i4;
 }
