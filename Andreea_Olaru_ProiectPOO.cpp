@@ -1,5 +1,6 @@
 #include<iostream>
 #include<vector>
+#include<fstream>
 using namespace std;
 //Andreea Maria Olaru - Mall
 
@@ -121,6 +122,19 @@ public:
 		return op;
 	}
 
+	friend ofstream& operator<<(ofstream& ecran, const Magazine& m) {
+		ecran << m.numeFirma << endl;
+		ecran << m.suprafata << endl;
+		ecran << m.nrArticole << endl;
+		if (m.nrArticole > 0) {
+			for (int i = 0; i < m.nrArticole; i++) {
+				ecran << m.numeArticole[i] << " ";
+			}
+		}
+		ecran << endl;
+		return ecran;
+	}
+
 	friend istream& operator>>(istream& is, Magazine& m) {
 		cout << "Numele firmei: ";
 		is >> m.numeFirma;
@@ -137,6 +151,47 @@ public:
 			is >> m.numeArticole[i];
 		}
 		return is;
+	}
+
+	friend ifstream& operator>>(ifstream& is, Magazine& m) {
+		is >> m.numeFirma;
+		is >> m.suprafata;
+		is >> m.nrArticole;
+		if (m.numeArticole != NULL) {
+			delete[]m.numeArticole;
+		}
+		m.numeArticole = new string[m.nrArticole];
+		for (int i = 0; i < m.nrArticole; i++) {
+			is >> m.numeArticole[i];
+		}
+		return is;
+	}
+
+	void scrieInFisierBinar(fstream& f) {
+		f.write((char*)&this->numeFirma, sizeof(string));
+		f.write((char*)&this->suprafata, sizeof(float));
+		f.write((char*)&this->nrArticole, sizeof(int));
+		int lungime = strlen((char*)this->numeArticole);
+		f.write((char*)&lungime, sizeof(int));
+		for (int i = 0; i < lungime; i++) {
+			f.write((char*)&this->numeArticole[i], sizeof(string));
+		}
+	}
+
+	void citesteDinFisierBinar(fstream& f) {
+		f.read((char*)&this->numeFirma, sizeof(string));
+		f.read((char*)&this->suprafata, sizeof(float));
+		f.read((char*)&this->nrArticole, sizeof(int));
+		int lungime;
+		f.read((char*)&lungime, sizeof(int));
+		if (this->numeArticole != NULL) {
+			delete[]this->numeArticole;
+		}
+		this->numeArticole = new string[lungime + 1];
+		for (int i = 0; i < lungime; i++) {
+			f.read((char*)&this->numeArticole[i], sizeof(string));
+		}
+		this->numeArticole[lungime] = '\0';
 	}
 
 	~Magazine() {
@@ -326,6 +381,19 @@ public:
 		return op;
 	}
 
+	friend ofstream& operator<<(ofstream& op, const Angajati& a) {
+		op << a.uniforma << endl;
+		op << a.salariu << endl;
+		op << a.nrAngajati << endl;
+		if (a.nrAngajati > 0) {
+			for (int i = 0; i < a.nrAngajati; i++) {
+				op << a.numeAngajati[i] << " ";
+			}
+		}
+		op << endl;
+		return op;
+	}
+
 	friend istream& operator>>(istream& is, Angajati& a) {
 		cout << "Uniforma: ";
 		is >> a.uniforma;
@@ -342,6 +410,47 @@ public:
 			is >> a.numeAngajati[i];
 		}
 		return is;
+	}
+
+	friend ifstream& operator>>(ifstream& is, Angajati& a) {;
+		is >> a.uniforma;
+		is >> a.salariu;
+		is >> a.nrAngajati;
+		if (a.numeAngajati != NULL) {
+			delete[]a.numeAngajati;
+		}
+		a.numeAngajati = new string[a.nrAngajati];
+		for (int i = 0; i < a.nrAngajati; i++) {
+			is >> a.numeAngajati[i];
+		}
+		return is;
+	}
+
+	void scrieInFisierBinar(fstream& fis) {
+		fis.write((char*)&this->uniforma, sizeof(string));
+		fis.write((char*)&this->salariu, sizeof(float));
+		fis.write((char*)&this->nrAngajati, sizeof(int));
+		int lungime2 = strlen((char*)this->numeAngajati);
+		fis.write((char*)&lungime2, sizeof(int));
+		for (int i = 0; i < lungime2; i++) {
+			fis.write((char*)&this->numeAngajati[i], sizeof(string));
+		}
+	}
+
+	void citesteDinFisierBinar(fstream& bin) {
+		bin.read((char*)&this->uniforma, sizeof(string));
+		bin.read((char*)&this->salariu, sizeof(float));
+		bin.read((char*)&this->nrAngajati, sizeof(int));
+		int lungime3;
+		bin.read((char*)&lungime3, sizeof(int));
+		if (this->numeAngajati != NULL) {
+			delete[]this->numeAngajati;
+		}
+		this->numeAngajati = new string[lungime3 + 1];
+		for (int i = 0; i < lungime3; i++) {
+			bin.read((char*)&this->numeAngajati[i], sizeof(string));
+		}
+		this->numeAngajati[lungime3] = '\0';
 	}
 
 	Angajati operator+(Angajati an) {
@@ -719,7 +828,8 @@ public:
 		this->dataInventariere = dataInventariere;
 	}
 	int getCantitateProdus() {
-		cout << "La data de: " << dataInventariere << ", produsele de tip: " << denumire << " au fost trecute in inventar intr-o cantitate de: " << cantitate.getCantitate();
+		cout << "La data de: " << dataInventariere << ", produsele de tip: " << denumire << " au fost trecute in inventar intr-o cantitate de: ";
+		return cantitate.getCantitate();
 	}
 	void setCantitateProdus(Produse& cantitate) {
 		this->cantitate = cantitate;
@@ -804,6 +914,25 @@ void main() {
 	//magazin1[0] = "palarii";
 	//magazin1.afisareMagazine();
 
+	Magazine m5;
+	Magazine m6("Sephora", 38);
+	cin >> m5;
+	ofstream afisare("magazine.txt", ios::out);
+	afisare << m5;
+	afisare.close();
+	ifstream citire("magazine.txt", ios::in);
+	citire >> m6;
+	cout << m6;
+	citire.close();
+
+	string* v = new string[2];
+	v[0] = "tricouri";
+	v[1] = "adidasi";
+	Magazine m7("Nike", 26.8, 2, v);
+	fstream f("magazin.bin", ios::out | ios::binary);
+	m7.scrieInFisierBinar(f);
+	f.close();
+
 	//Angajati angajat1;
 	//angajat1.afisareAngajati();
 
@@ -857,100 +986,120 @@ void main() {
 	//else cout << "Angajatii din magazinul 5 au un salariu mai mare/sunt mai numerosi.";
 	//cout << endl;
 
-	Produse produs1;
-	produs1.afisareProdus();
+	Angajati a6;
+	Angajati a7("camasa", 3100);
+	cin >> a6;
+	ofstream afisare1("angajati.txt", ios::out);
+	afisare1 << a6;
+	afisare1.close();
+	ifstream citire1("angajati.txt", ios::in);
+	citire1 >> a7;
+	cout << a7;
+	citire1.close();
 
-	Produse produs2(120, 1);
-	produs2.afisareProdus();
-	produs2.adaugareProdus("pantaloni");
-	produs2.afisareProdus();
+	string* v2 = new string[3];
+	v2[0] = "Andreea";
+	v2[1] = "Ioana";
+	v2[2] = "Bianca";
+	Angajati a8("Nike", 26.8, 2, v2);
+	fstream fisBin("angajat.bin", ios::out | ios::binary);
+	a8.scrieInFisierBinar(fisBin);
+	fisBin.close();
 
-	string* numeProduse = new string[3];
-	numeProduse[0] = "geaca";
-	numeProduse[1] = "blugi";
-	numeProduse[2] = "adidasi";
+	//Produse produs1;
+	//produs1.afisareProdus();
 
-	Produse produs3(150, 3, 3, numeProduse);
-	produs3.afisareProdus();
+	//Produse produs2(120, 1);
+	//produs2.afisareProdus();
+	//produs2.adaugareProdus("pantaloni");
+	//produs2.afisareProdus();
 
-	cout << Produse::getNrInventar() << endl;
-	Produse p1 = produs2;
-	Produse p2(produs2);
-	produs2.afisareProdus();
-	cout << p1.getTVA() << endl;
-	cout << p1.getPret() << endl;
-	p1.setPret(250);
-	cout << p1.getPret() << endl;
-	cout << p1.getGreutate() << endl;
-	p1.setGreutate(5);
-	cout << p1.getGreutate() << endl;
-	cout << p1.getCantitate() << endl;
-	p1.setCantitate(4);
-	cout << p1.getCantitate() << endl;
+	//string* numeProduse = new string[3];
+	//numeProduse[0] = "geaca";
+	//numeProduse[1] = "blugi";
+	//numeProduse[2] = "adidasi";
 
-	string* vector2 = new string[4] {"adidasi", "palarii", "sacouri", "tricouri"};
-	p1.setProduse(4, vector2);
-	p1.afisareProdus();
-	cout << *p1.getNumeProduse() << endl;
-	//cout << p1.getNumeProduse() << endl;
-	cout << p1.getNumeProdus(1) << endl;
-	delete[]vector2;
-	cin >> produs1;
-	produs1.afisareProdus();
-	if (p1 >= produs3) {
-		cout << "Produsele sunt mai scumpe.";
-		}
-	else cout << "Produsele sunt mai ieftine.";
-	cout << endl;
-	Produse p3;
-	p3 = p1 - produs3;
-	p3.afisareProdus();
+	//Produse produs3(150, 3, 3, numeProduse);
+	//produs3.afisareProdus();
 
-	/*const int numarProduse_P = 2;
-	std::vector<Produse>vectorProduse(numarProduse_P);
+	//cout << Produse::getNrInventar() << endl;
+	//Produse p1 = produs2;
+	//Produse p2(produs2);
+	//produs2.afisareProdus();
+	//cout << p1.getTVA() << endl;
+	//cout << p1.getPret() << endl;
+	//p1.setPret(250);
+	//cout << p1.getPret() << endl;
+	//cout << p1.getGreutate() << endl;
+	//p1.setGreutate(5);
+	//cout << p1.getGreutate() << endl;
+	//cout << p1.getCantitate() << endl;
+	//p1.setCantitate(4);
+	//cout << p1.getCantitate() << endl;
+
+	//string* vector2 = new string[4] {"adidasi", "palarii", "sacouri", "tricouri"};
+	//p1.setProduse(4, vector2);
+	//p1.afisareProdus();
+	//cout << *p1.getNumeProduse() << endl;
+	////cout << p1.getNumeProduse() << endl;
+	//cout << p1.getNumeProdus(1) << endl;
+	//delete[]vector2;
+	//cin >> produs1;
+	//produs1.afisareProdus();
+	//if (p1 >= produs3) {
+	//	cout << "Produsele sunt mai scumpe.";
+	//	}
+	//else cout << "Produsele sunt mai ieftine.";
+	//cout << endl;
+	//Produse p3;
+	//p3 = p1 - produs3;
+	//p3.afisareProdus();
+
+	///*const int numarProduse_P = 2;
+	//std::vector<Produse>vectorProduse(numarProduse_P);
 
 
-	for (int i = 0; i < numarProduse_P; ++i) {
-		cout << "Introduceti datele pentru obiectul Produs la pozitia " << i << ":\n";
-		cin >> vectorProduse[i];
-	}
-	cout << endl << endl;
-	for (int i = 0; i < numarProduse_P; ++i) {
-		cout << "Afisare obiect Produs la pozitia " << i << ":\n";
-		cout << vectorProduse[i];
-	}
+	//for (int i = 0; i < numarProduse_P; ++i) {
+	//	cout << "Introduceti datele pentru obiectul Produs la pozitia " << i << ":\n";
+	//	cin >> vectorProduse[i];
+	//}
+	//cout << endl << endl;
+	//for (int i = 0; i < numarProduse_P; ++i) {
+	//	cout << "Afisare obiect Produs la pozitia " << i << ":\n";
+	//	cout << vectorProduse[i];
+	//}
 
-	const int numar_linii = 2;
-	const int numar_coloane = 2;
+	//const int numar_linii = 2;
+	//const int numar_coloane = 2;
 
-	Produse matriceProduse[numar_linii][numar_coloane];
-	for (int i = 0; i < numar_linii; ++i) {
-		for (int j = 0; j < numar_coloane; ++j) {
-			cout<<"Introduceti datele pentru obiectul Produs la pozitia ["<<i<<"]["<<j<<"]:\n";
-			cin >> matriceProduse[i][j];
-			cout << endl;
-		}
-	}
+	//Produse matriceProduse[numar_linii][numar_coloane];
+	//for (int i = 0; i < numar_linii; ++i) {
+	//	for (int j = 0; j < numar_coloane; ++j) {
+	//		cout<<"Introduceti datele pentru obiectul Produs la pozitia ["<<i<<"]["<<j<<"]:\n";
+	//		cin >> matriceProduse[i][j];
+	//		cout << endl;
+	//	}
+	//}
 
-	for (int i = 0; i < numar_linii; ++i) {
-		for (int j = 0; j < numar_coloane; ++j) {
-			cout << "Afisare obiect Produs la pozitia [" << i << "][" << j << "]:\n";
-			cout << matriceProduse[i][j];
-		}
-	}*/
+	//for (int i = 0; i < numar_linii; ++i) {
+	//	for (int j = 0; j < numar_coloane; ++j) {
+	//		cout << "Afisare obiect Produs la pozitia [" << i << "][" << j << "]:\n";
+	//		cout << matriceProduse[i][j];
+	//	}
+	//}*/
 
-	Inventar inventar1("Adidasi", "31 Octombrie", p1);
-	Inventar inventar2(produs3);
-	Inventar i3;
-	Inventar i4(p2);
-	i3 = inventar1;
-	inventar1.afisareInventar();
-	inventar2.getDenumire();
-	cout << inventar1.getCantitateProdus() << endl;
-	inventar1.afisareInventar();
-	inventar2.afisareInventar();
-	cout << endl;
-	cout << i3;
-	cin >> i4;
-	cout << i4;
+	//Inventar inventar1("Adidasi", "31 Octombrie", p1);
+	//Inventar inventar2(produs3);
+	//Inventar i3;
+	//Inventar i4(p2);
+	//i3 = inventar1;
+	//inventar1.afisareInventar();
+	//inventar2.getDenumire();
+	//cout << inventar1.getCantitateProdus() << endl;
+	//inventar1.afisareInventar();
+	//inventar2.afisareInventar();
+	//cout << endl;
+	//cout << i3;
+	//cin >> i4;
+	//cout << i4;
 }
