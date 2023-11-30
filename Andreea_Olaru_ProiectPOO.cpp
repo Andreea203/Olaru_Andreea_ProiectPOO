@@ -857,6 +857,205 @@ public:
 	}
 };
 
+class MagazinOnline : public Magazine {
+private:
+	int vizitatoriZilnici;
+	char* numeWebsite;
+public:
+	MagazinOnline() : Magazine("Nike", 40.2) {
+		this->vizitatoriZilnici = 150;
+		this->numeWebsite = new char[strlen("Nike.com") + 1];
+		strcpy_s(this->numeWebsite, strlen("Nike.com") + 1, "Nike.com");
+	}
+
+	MagazinOnline(int vizitatoriZilnici, const char* numeWebsite) : Magazine() {
+		this->vizitatoriZilnici = vizitatoriZilnici;
+		this->numeWebsite = new char[strlen(numeWebsite) + 1];
+		strcpy_s(this->numeWebsite, strlen(numeWebsite) + 1, numeWebsite);
+	}
+
+	MagazinOnline(int vizitatoriZilnici, const char* numeWebsite, string numeFirma, float suprafata, int nrArticole, string* numeArticole) : Magazine(numeFirma, suprafata, nrArticole, numeArticole) {
+		this->vizitatoriZilnici = vizitatoriZilnici;
+		this->numeWebsite = new char[strlen(numeWebsite) + 1];
+		strcpy_s(this->numeWebsite, strlen(numeWebsite) + 1, numeWebsite);
+	}
+
+	MagazinOnline(const MagazinOnline& mg) : Magazine(mg) {
+		this->vizitatoriZilnici = mg.vizitatoriZilnici;
+		this->numeWebsite = new char[strlen(mg.numeWebsite) + 1];
+		strcpy_s(this->numeWebsite, strlen(mg.numeWebsite) + 1, mg.numeWebsite);
+	}
+
+	MagazinOnline operator=(const MagazinOnline& mg) {
+		if (this != &mg) {
+			(Magazine)*this = (Magazine)mg;
+			this->vizitatoriZilnici = mg.vizitatoriZilnici;
+			if (this->numeWebsite != NULL) {
+				delete[]this->numeWebsite;
+			}
+			this->numeWebsite = new char[strlen(mg.numeWebsite) + 1];
+			strcpy_s(this->numeWebsite, strlen(mg.numeWebsite) + 1, mg.numeWebsite);
+		}
+		return *this;
+	}
+
+	~MagazinOnline() {
+		if (this->numeWebsite != NULL) {
+			delete[]this->numeWebsite;
+		}
+	}
+
+	int getVizitatoriZilnici() {
+		return this->vizitatoriZilnici;
+	}
+	void setVizitatoriZilnici(int vizitatoriZilnici) {
+		if (this->vizitatoriZilnici > 0) {
+			this->vizitatoriZilnici = vizitatoriZilnici;
+		}
+	}
+
+	char* getNumeWebsite() {
+		return numeWebsite;
+	}
+	void setNumeWebsite(const char* numeWebsite) {
+		if (strlen(numeWebsite) > 0) {
+			if (this->numeWebsite != NULL) {
+				delete[]this->numeWebsite;
+			}
+			this->numeWebsite = new char[strlen(numeWebsite) + 1];
+			strcpy_s(this->numeWebsite, strlen(numeWebsite) + 1, numeWebsite);
+		}
+	}
+
+	friend ostream& operator<<(ostream& ecran, const MagazinOnline& m) {
+		ecran << (Magazine)m;
+		ecran << m.vizitatoriZilnici << ", " << m.numeWebsite << endl;
+		return ecran;
+	}
+
+	friend istream& operator>>(istream& cit, MagazinOnline& m) {
+		cit >> (Magazine&)m;
+		cout << "Numar vizitatori zilnici: ";
+		cit >> m.vizitatoriZilnici;
+		if (m.numeWebsite != NULL) {
+			delete[]m.numeWebsite;
+		}
+		char aux1[50];
+		cout << "Numele website-ului: ";
+		cit >> aux1;
+		m.numeWebsite = new char[strlen(aux1) + 1];
+		strcpy_s(m.numeWebsite, strlen(aux1) + 1, aux1);
+		return cit;
+	}
+}; 
+
+class AngajatiFullTime : public Angajati {
+private:
+	bool asigurareMedicala;
+	int nrOreSaptamanal;
+	char* titluPozitie;
+public:
+	AngajatiFullTime() : Angajati("camasa", 5000) {
+		this->asigurareMedicala = true;
+		this->nrOreSaptamanal = 40;
+		this->titluPozitie = new char[strlen("Manager") + 1];
+		strcpy_s(this->titluPozitie, strlen("Manager") + 1, "Manager");
+	}
+
+	AngajatiFullTime(bool asigurareMedicala, int nrOreSaptamanal, const char* titluPozitie) : Angajati() {
+		this->asigurareMedicala = asigurareMedicala;
+		this->nrOreSaptamanal = nrOreSaptamanal;
+		this->titluPozitie = new char[strlen(titluPozitie) + 1];
+		strcpy_s(this->titluPozitie, strlen(titluPozitie) + 1, titluPozitie);
+	}
+
+	AngajatiFullTime(bool asigurareMedicala, int nrOreSaptamanal, const char* titluPozitie, string uniforma, float salariu, int nrAngajati, string* numeAngajati) : Angajati(uniforma, salariu, nrAngajati, numeAngajati) {
+		this->asigurareMedicala = asigurareMedicala;
+		this->nrOreSaptamanal = nrOreSaptamanal;
+		this->titluPozitie = new char[strlen(titluPozitie) + 1];
+		strcpy_s(this->titluPozitie, strlen(titluPozitie) + 1, titluPozitie);
+	}
+
+	AngajatiFullTime(const AngajatiFullTime& ang) : Angajati(ang) {
+		this->asigurareMedicala = ang.asigurareMedicala;
+		this->nrOreSaptamanal = ang.nrOreSaptamanal;
+		this->titluPozitie = new char[strlen(ang.titluPozitie) + 1];
+		strcpy_s(this->titluPozitie, strlen(ang.titluPozitie) + 1, ang.titluPozitie);
+	}
+
+	AngajatiFullTime operator=(const AngajatiFullTime& ang) {
+		if (this != &ang) {
+			(Angajati)*this = (Angajati)ang;
+			this->asigurareMedicala = ang.asigurareMedicala;
+			this->nrOreSaptamanal = ang.nrOreSaptamanal;
+			if (this->titluPozitie != NULL) {
+				delete[]this->titluPozitie;
+			}
+			this->titluPozitie = new char[strlen(ang.titluPozitie) + 1];
+			strcpy_s(this->titluPozitie, strlen(ang.titluPozitie) + 1, ang.titluPozitie);
+		}
+		return *this;
+	}
+
+	~AngajatiFullTime() {
+		if (this->titluPozitie != NULL) {
+			delete[]this->titluPozitie;
+		}
+	}
+
+	bool getAsigurareMedicala() {
+		return this->asigurareMedicala;
+	}
+	void setAsigurareMedicala(bool asigurareMedicala) {
+		this->asigurareMedicala = asigurareMedicala;
+	}
+
+	int getNrOreSaptamanal() {
+		return this->nrOreSaptamanal;
+	}
+	void setNrOreSaptamanal(int nrOreSaptamanal) {
+		if (this->nrOreSaptamanal > 0) {
+			this->nrOreSaptamanal = nrOreSaptamanal;
+		}
+	}
+
+	char* getTitluPozitie() {
+		return titluPozitie;
+	}
+	void setTitluPozitie(const char* titluPozitie) {
+		if (strlen(titluPozitie) > 0) {
+			if (this->titluPozitie != NULL) {
+				delete[]this->titluPozitie;
+			}
+			this->titluPozitie = new char[strlen(titluPozitie) + 1];
+			strcpy_s(this->titluPozitie, strlen(titluPozitie) + 1, titluPozitie);
+		}
+	}
+
+	friend ostream& operator<<(ostream& ecran, const AngajatiFullTime& a) {
+		ecran << (Angajati)a;
+		ecran << a.asigurareMedicala << ", " << a.nrOreSaptamanal << ", " << a.titluPozitie << endl;
+		return ecran;
+	}
+
+	friend istream& operator>>(istream& citire, AngajatiFullTime& a) {
+		citire >> (Angajati&)a;
+		cout << "Are asigurare medicala? : ";
+		citire >> a.asigurareMedicala;
+		cout << "Numar ore lucrate saptamanal: ";
+		citire >> a.nrOreSaptamanal;
+		if (a.titluPozitie != NULL) {
+			delete[]a.titluPozitie;
+		}
+		char aux[30];
+		cout << "Titlul pozitiei ocupate de angajat: ";
+		citire >> aux;
+		a.titluPozitie = new char[strlen(aux) + 1];
+		strcpy_s(a.titluPozitie, strlen(aux) + 1, aux);
+		return citire;
+	}
+};
+
 void main() {
 	//Magazine magazin1;
 	//magazin1.afisareMagazine();
@@ -914,7 +1113,7 @@ void main() {
 	//magazin1[0] = "palarii";
 	//magazin1.afisareMagazine();
 
-	Magazine m5;
+	/*Magazine m5;
 	Magazine m6("Sephora", 38);
 	cin >> m5;
 	ofstream afisare("magazine.txt", ios::out);
@@ -931,7 +1130,7 @@ void main() {
 	Magazine m7("Nike", 26.8, 2, v);
 	fstream f("magazin.bin", ios::out | ios::binary);
 	m7.scrieInFisierBinar(f);
-	f.close();
+	f.close();*/
 
 	//Angajati angajat1;
 	//angajat1.afisareAngajati();
@@ -986,7 +1185,7 @@ void main() {
 	//else cout << "Angajatii din magazinul 5 au un salariu mai mare/sunt mai numerosi.";
 	//cout << endl;
 
-	Angajati a6;
+	/*Angajati a6;
 	Angajati a7("camasa", 3100);
 	cin >> a6;
 	ofstream afisare1("angajati.txt", ios::out);
@@ -1004,7 +1203,7 @@ void main() {
 	Angajati a8("Nike", 26.8, 2, v2);
 	fstream fisBin("angajat.bin", ios::out | ios::binary);
 	a8.scrieInFisierBinar(fisBin);
-	fisBin.close();
+	fisBin.close();*/
 
 	//Produse produs1;
 	//produs1.afisareProdus();
@@ -1102,4 +1301,39 @@ void main() {
 	//cout << i3;
 	//cin >> i4;
 	//cout << i4;
+
+	MagazinOnline mag1;
+	MagazinOnline mag2(200, "Zara.com");
+	MagazinOnline mag3 = mag1;
+	MagazinOnline mag4;
+	mag4 = mag1;
+	cout << mag4;
+	cin >> mag1;
+	cout << mag1;
+	MagazinOnline mag5;
+	cout << mag5.getVizitatoriZilnici() << endl;
+	mag5.setVizitatoriZilnici(250);
+	cout << mag5.getVizitatoriZilnici() << endl;
+	cout << mag5.getNumeWebsite() << endl;
+	mag5.setNumeWebsite("Puma.com");
+	cout << mag5.getNumeWebsite() << endl;
+
+	AngajatiFullTime ang1;
+	AngajatiFullTime ang2(true, 40, "Manager");
+	AngajatiFullTime ang3 = ang1;
+	AngajatiFullTime ang4;
+	ang4 = ang1;
+	cout << ang4;
+	cin >> ang1;
+	cout << ang1<<endl;
+	AngajatiFullTime ang5;
+	cout<<ang5.getAsigurareMedicala() << endl;
+	ang5.setAsigurareMedicala(0);
+	cout << ang5.getAsigurareMedicala() << endl;
+	cout << ang5.getNrOreSaptamanal() << endl;
+	ang5.setNrOreSaptamanal(35);
+	cout << ang5.getNrOreSaptamanal() << endl;
+	cout << ang5.getTitluPozitie() << endl;
+	ang5.setTitluPozitie("Asistent");
+	cout << ang5.getTitluPozitie() << endl;
 }
